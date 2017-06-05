@@ -1,5 +1,3 @@
-//import com.typesafe.sbt.packager.rpm.RpmPlugin.Names.Post
-
 name := """template-project"""
 organization := "uk.co.bbc"
 
@@ -32,45 +30,47 @@ libraryDependencies ++= Seq(
 enablePlugins(JavaServerAppPackaging)
 enablePlugins(SystemVPlugin)
 
-packageName := "entsyn-pips-change-shovel"
+packageName := "template-project-package"
 rpmVendor := "BBC"
 rpmRelease := Option(System.getenv("BUILD_RELEASE")) getOrElse "1"
 rpmLicense := Some("Copyright BBC MMXVII")
 rpmGroup := Some("BBC")
 rpmRequirements ++= Seq("cloud-httpd24-ssl-services-devs", "java-1.8.0-openjdk", "cosmos_to_env", "cloudteam-td-agent-setup")
-packageDescription := "Read PIPS Changes into Segment Service"
+packageDescription := "An example scala play project"
 
 // Disable auto start for Cosmos packaging
-//serviceAutostart in Rpm := false
-//
-//testOptions in Test += Tests.Argument(TestFrameworks.Specs2, "exclude", "integration, database")
-//
-//mappings in Universal += {
-//  baseDirectory.value / "cosmos" / "00default-vars.conf" -> "/httpd/00default-vars.conf"
-//}
-//
-//mappings in Universal += {
-//  baseDirectory.value / "cosmos" / "move_files.sh" -> "move_files.sh"
-//}
-//
-//// Add the contents of the bake-scripts directory into the RPM
-//mappings in Universal ++= {
-//  val bakeDir = baseDirectory.value / "cosmos" / "bake-scripts"
-//
-//  for {
-//    (file, relativePath) <- (bakeDir.*** --- bakeDir) pair relativeTo(bakeDir)
-//  } yield file -> s"/etc/bake-scripts/$relativePath"
-//}
-//
-//maintainerScripts in Rpm := maintainerScriptsAppend((maintainerScripts in Rpm).value)(
-//  Post -> s"/usr/share/entsyn-pips-change-shovel/move_files.sh"
-//)
-//
-//javaOptions in Universal ++= Seq(
-//  // Since play uses separate pidfile we have to provide it with a proper path
-//  // name of the pid file must be play.pid
-//  s"-Dpidfile.path=/var/run/${packageName.value}/play.pid"
-//)
-//
-//
+serviceAutostart in Rpm := false
+
+testOptions in Test += Tests.Argument(TestFrameworks.Specs2, "exclude", "integration, database")
+
+mappings in Universal += {
+  baseDirectory.value / "cosmos" / "00default-vars.conf" -> "/httpd/00default-vars.conf"
+}
+
+mappings in Universal += {
+  baseDirectory.value / "cosmos" / "move_files.sh" -> "move_files.sh"
+}
+
+// Add the contents of the bake-scripts directory into the RPM
+mappings in Universal ++= {
+  val bakeDir = baseDirectory.value / "cosmos" / "bake-scripts"
+
+  for {
+    (file, relativePath) <- (bakeDir.*** --- bakeDir) pair relativeTo(bakeDir)
+  } yield file -> s"/etc/bake-scripts/$relativePath"
+}
+
+import com.typesafe.sbt.packager.rpm.RpmPlugin.Names.Post
+
+maintainerScripts in Rpm := maintainerScriptsAppend((maintainerScripts in Rpm).value)(
+  Post -> s"/usr/share/template-project-package/move_files.sh"
+)
+
+javaOptions in Universal ++= Seq(
+  // Since play uses separate pidfile we have to provide it with a proper path
+  // name of the pid file must be play.pid
+  s"-Dpidfile.path=/var/run/${packageName.value}/play.pid"
+)
+
+
 
